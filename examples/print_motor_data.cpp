@@ -4,6 +4,7 @@
 #include <chrono>
 #include <thread>
 #include <csignal>
+#include <array>
 
 // SDK 헤더 (사용자 환경에 맞게 경로 확인 필요)
 #include "igris_sdk/channel_factory.hpp"
@@ -11,6 +12,13 @@
 #include "igris_sdk/types.hpp"
 
 using namespace igris_sdk;
+
+static const std::array<const char *, 31> MOTOR_NAMES = {
+    "Waist_Yaw",    "Waist_L",          "Waist_R",         "Hip_Pitch_L",    "Hip_Roll_L",    "Hip_Yaw_L",    "Knee_Pitch_L",
+    "Ankle_Out_L",  "Ankle_In_L",       "Hip_Pitch_R",     "Hip_Roll_R",     "Hip_Yaw_R",     "Knee_Pitch_R", "Ankle_Out_R",
+    "Ankle_In_R",   "Shoulder_Pitch_L", "Shoulder_Roll_L", "Shoulder_Yaw_L", "Elbow_Pitch_L", "Wrist_Yaw_L",  "Wrist_Front_L",
+    "Wrist_Back_L", "Shoulder_Pitch_R", "Shoulder_Roll_R", "Shoulder_Yaw_R", "Elbow_Pitch_R", "Wrist_Yaw_R",  "Wrist_Front_R",
+    "Wrist_Back_R", "Neck_Yaw",         "Neck_Pitch"};
 
 // 전역 플래그 (Ctrl+C 종료용)
 bool g_running = true;
@@ -26,18 +34,19 @@ void LowStateCallback(const LowState &state) {
     // 터미널 화면 초기화 (ANSI escape code)
     std::cout << "\033[2J\033[1;1H"; 
     
-    std::cout << "==========================================================================================" << std::endl;
-    std::cout << "                         IGRIS SDK Motor State Monitor (Real-time)" << std::endl;
-    std::cout << "==========================================================================================" << std::endl;
+    std::cout << "================================================================================================================" << std::endl;
+    std::cout << "                                     IGRIS SDK Motor State Monitor (Real-time)" << std::endl;
+    std::cout << "================================================================================================================" << std::endl;
     
     // 테이블 헤더 출력
     std::cout << std::setw(4) << "ID" 
+              << std::setw(18) << "Name"
               << std::setw(12) << "Pos(rad)" 
               << std::setw(12) << "Vel(rad/s)" 
               << std::setw(12) << "Torque(Nm)" 
               << std::setw(10) << "Temp(C)" 
               << std::setw(15) << "StatusBits" << std::endl;
-    std::cout << "------------------------------------------------------------------------------------------" << std::endl;
+    std::cout << "----------------------------------------------------------------------------------------------------------------" << std::endl;
 
     // 31개 모터 데이터 순회
     for (int i = 0; i < 31; ++i) {
@@ -45,6 +54,7 @@ void LowStateCallback(const LowState &state) {
         
         std::cout << std::fixed << std::setprecision(3)
                   << std::setw(4)  << i
+                  << std::setw(18) << MOTOR_NAMES[i]
                   << std::setw(12) << motor.q()           // 현재 위치
                   << std::setw(12) << motor.dq()          // 현재 속도
                   << std::setw(12) << motor.tau_est()     // 추정 토크
@@ -54,7 +64,7 @@ void LowStateCallback(const LowState &state) {
                   << std::endl;
     }
     
-    std::cout << "------------------------------------------------------------------------------------------" << std::endl;
+    std::cout << "----------------------------------------------------------------------------------------------------------------" << std::endl;
     std::cout << "Press Ctrl+C to exit..." << std::endl;
 }
 
