@@ -111,9 +111,20 @@ target_link_libraries(
 set_target_properties(metaquest PROPERTIES INSTALL_RPATH "$ORIGIN/../lib" BUILD_RPATH_USE_ORIGIN ON)
 
 # Sensor configuration example (sensor data visualization example)
+# add_executable(sensor_configuration sensor_config.cpp)
+# target_link_libraries(
+#   sensor_configuration igris_sdk::igris_sdk
+# )
 add_executable(sensor_configuration sensor_config.cpp)
 target_link_libraries(
-  sensor_configuration igris_sdk::igris_sdk
+  sensor_configuration 
+  igris_sdk::igris_sdk 
+  ${OpenCV_LIBS}
+)
+
+add_executable(print_motor_data print_motor_data.cpp)
+target_link_libraries(
+  print_motor_data igris_sdk::igris_sdk
 )
 
 set_target_properties(
